@@ -1,14 +1,14 @@
 resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket"
+  bucket = var.my_bucket
 
   tags = {
-    Name        = "My bucket"
-    Environment = "Dev"
+    Name        = var.tag_bucket_name
+    Environment = var.tag_bucket_env
   }
 }
 
-resource "aws_s3_bucket_website_configuration" "example" {
-  bucket = aws_s3_bucket.example.bucket
+resource "aws_s3_bucket_website_configuration" "b" {
+  bucket = aws_s3_bucket.b.id
 
   index_document {
     suffix = "index.html"
@@ -29,17 +29,13 @@ resource "aws_s3_bucket_website_configuration" "example" {
 }
 
 
-resource "aws_s3_bucket_acl" "example" {
+resource "aws_s3_bucket_acl" "b" {
   bucket = aws_s3_bucket.b.id
   acl    = "private"
 }
 
-resource "aws_s3_bucket" "example" {
-  bucket = "my-tf-test-bucket"
-}
-
 resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
-  bucket = aws_s3_bucket.example.id
+  bucket = aws_s3_bucket.b.id
   policy = data.aws_iam_policy_document.allow_access_from_another_account.json
 }
 
@@ -56,19 +52,19 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
     ]
 
     resources = [
-      aws_s3_bucket.example.arn,
-      "${aws_s3_bucket.example.arn}/*",
+      aws_s3_bucket.b.arn,
+      "${aws_s3_bucket.b.arn}/*",
     ]
   }
 }
 
 resource "aws_s3_object" "object" {
-  bucket = "your_bucket_name"
+  bucket = aws_s3_bucket.b.id
   key    = "new_object_key"
-  source = "path/to/file"
+  source = "./www/index.html"
 
   # The filemd5() function is available in Terraform 0.11.12 and later
   # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
   # etag = "${md5(file("path/to/file"))}"
-  etag = filemd5("path/to/file")
+  etag = filemd5("./www/index.html")
 }
