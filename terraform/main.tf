@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
   }
 }
 
-resource "aws_s3_object" "object" {
+resource "aws_s3_object" "object1" {
   bucket = aws_s3_bucket.b.id
   key    = "index.html"
   source = "./www/index.html"
@@ -68,7 +68,7 @@ resource "aws_s3_object" "object" {
   # etag = "${md5(file("path/to/file"))}"
   etag = filemd5("./www/index.html")
 }
-resource "aws_s3_object" "object" {
+resource "aws_s3_object" "object2" {
   bucket = aws_s3_bucket.b.id
   key    = "error.html"
   source = "./www/error.html"
